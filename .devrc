@@ -1,0 +1,30 @@
+#!/usr/bin/zsh
+
+loadSecrets() {
+    export COINBASE_API_KEY=$(cat local/secrets.json | jq -r .COINBASE_API_KEY)
+    export COINBASE_API_SECRET=$(cat local/secrets.json | jq -r .COINBASE_API_SECRET)
+    export COINBASE_API_PASSPHRASE=$(cat local/secrets.json | jq -r .COINBASE_API_PASSPHRASE)
+}
+
+clean() {
+    if [[ -d "dist" ]]; then
+        rm -rf "dist"
+    fi
+}
+
+run() {
+    loadSecrets
+    go run ./cmd/main.go
+}
+
+generateReadme() {
+
+}
+
+build() {
+    loadSecrets
+    clean
+    mkdir dist
+    go build ./cmd/main.go 
+    mv main dist
+}

@@ -1,4 +1,4 @@
-package rules
+package asset
 
 import "github.com/preichenberger/go-coinbasepro/v2"
 

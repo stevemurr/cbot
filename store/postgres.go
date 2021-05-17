@@ -22,11 +22,11 @@ type Postgres struct {
 
 func NewPostgres(host string, username string, password string, port int, db string) *Postgres {
 	connectionInfo := ConnectionInfo{
-		Host:     "192.168.1.99",
-		Port:     5432,
-		Username: "murr",
-		Password: "flag9012",
-		DB:       "cbot",
+		Host:     host,
+		Port:     port,
+		Username: username,
+		Password: password,
+		DB:       db,
 	}
 	return &Postgres{connectionInfo: connectionInfo}
 }

@@ -1,13 +1,19 @@
 package store_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stevemurr/cbot/store"
 )
 
 func TestPostgres(t *testing.T) {
-	db := store.NewPostgres("192.168.1.99", "murr", "flag9012", 5432, "cbot")
+	db := store.NewPostgres(
+		os.Getenv("postgres_host"),
+		os.Getenv("postgres_username"),
+		os.Getenv("postgres_password"),
+		5432,
+		"cbot")
 	if err := db.Connect(); err != nil {
 		t.Fatal(err)
 	}

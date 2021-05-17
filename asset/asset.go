@@ -1,12 +1,12 @@
-package rules
+package asset
 
 import (
 	"github.com/preichenberger/go-coinbasepro/v2"
 )
 
-type Rule interface {
+type Asset interface {
 	Listener
-	Trader
+	Tradeable
 }
 
 type Listener interface {
@@ -14,7 +14,7 @@ type Listener interface {
 	Lookup() string
 }
 
-type Trader interface {
+type Tradeable interface {
 	// Evaluate is a goroutine that listens for messages and passes those messages to user logic
 	Evaluate(coinbasepro.Message)
 }

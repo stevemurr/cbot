@@ -4,6 +4,10 @@ loadSecrets() {
     export COINBASE_API_KEY=$(cat local/secrets.json | jq -r .COINBASE_API_KEY)
     export COINBASE_API_SECRET=$(cat local/secrets.json | jq -r .COINBASE_API_SECRET)
     export COINBASE_API_PASSPHRASE=$(cat local/secrets.json | jq -r .COINBASE_API_PASSPHRASE)
+    export postgres_username=$(cat local/secrets.json | jq -r .postgres_username)
+    export postgres_password=$(cat local/secrets.json | jq -r .postgres_password)
+    export postgres_port=$(cat local/secrets.json | jq -r .postgres_port)
+    export postgres_host=$(cat local/secrets.json | jq -r .postgres_host)
 }
 
 clean() {

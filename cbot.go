@@ -5,7 +5,7 @@ import (
 
 	ws "github.com/gorilla/websocket"
 	coinbasepro "github.com/preichenberger/go-coinbasepro/v2"
-	"github.com/stevemurr/cbot/rules"
+	"github.com/stevemurr/cbot/asset"
 	"github.com/stevemurr/cbot/store"
 )
 
@@ -16,7 +16,7 @@ type Bot struct {
 	D                   chan coinbasepro.Message
 	C                   chan coinbasepro.Message
 	L                   chan coinbasepro.Message
-	Rules               map[string]rules.Rule
+	Assets              map[string]asset.Asset
 	Store               store.Store
 }
 
@@ -45,7 +45,7 @@ func (b *Bot) getTickerConnection() error {
 
 func (b *Bot) updateSubscriptions() {
 	subs := []string{}
-	for sub := range b.Rules {
+	for sub := range b.Assets {
 		subs = append(subs, sub)
 	}
 	b.TickerSubscriptions = subs
@@ -73,7 +73,7 @@ func (b *Bot) Evaluate() error {
 	for {
 		select {
 		case m := <-b.C:
-			rule := b.Rules[m.ProductID]
+			rule := b.Assets[m.ProductID]
 			if rule == nil {
 				continue
 			}

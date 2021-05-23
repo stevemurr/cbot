@@ -74,10 +74,7 @@ func (b *Bot) Evaluate() error {
 		select {
 		case m := <-b.C:
 			rule := b.Assets[m.ProductID]
-			if rule == nil {
-				continue
-			}
-			rule.Evaluate(m)
+			rule.Trade(m)
 		default:
 			continue
 		}

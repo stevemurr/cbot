@@ -40,7 +40,7 @@ func main() {
 		L:     make(chan coinbasepro.Message),
 		C:     make(chan coinbasepro.Message),
 		Assets: map[string]asset.Asset{
-			"ADA-USD": &asset.ADA{Name: "ADA-USD"},
+			"ADA-USD": {Name: "ADA-USD"},
 		},
 		TickerUrl:           "wss://ws-feed.pro.coinbase.com",
 		TickerSubscriptions: []string{},

@@ -1,28 +1,19 @@
 package asset
 
 import (
-	"log"
 	"time"
 
 	"github.com/preichenberger/go-coinbasepro/v2"
 )
 
 type Asset struct {
-	Name       string
-	actionChan chan *Action
+	Name string
 	Tradeable
 	Trendable
 }
 
 func (a *Asset) Trade(m coinbasepro.Message) {
-	someTime := time.Now().Add(time.Second * 10)
-	fn := func() {
-		log.Println("make some judgments")
-		time.Sleep(time.Second * 1)
-		log.Println("executed the trade")
-	}
-	act := NewAction(a, someTime, fn)
-	a.actionChan <- act
+
 }
 
 func (a *Asset) LastNMinutes(float64) Point {

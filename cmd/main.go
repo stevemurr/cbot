@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"strconv"
@@ -23,25 +24,26 @@ func logger(L chan coinbasepro.Message) {
 }
 
 func main() {
-	port, err := strconv.Atoi(os.Getenv("postgres_port"))
+	port, err := strconv.Atoi(os.Getenv("cbot_postgres_port"))
 	if err != nil {
 		panic(err)
 	}
 	store := store.NewPostgres(
-		os.Getenv("postgres_host"),
-		os.Getenv("postgres_username"),
-		os.Getenv("postgres_password"),
+		os.Getenv("cbot_postgres_host"),
+		os.Getenv("cbot_postgres_username"),
+		os.Getenv("cbot_postgres_password"),
 		port,
 		"cbot")
 
+	assets := map[string]asset.Asset{}
+	json.Unmarshal([]byte(string(os.Getenv("cbot_assets"))), &assets)
+
 	b := cbot.Bot{
-		Store: store,
-		D:     make(chan coinbasepro.Message),
-		L:     make(chan coinbasepro.Message),
-		C:     make(chan coinbasepro.Message),
-		Assets: map[string]asset.Asset{
-			"ADA-USD": {Name: "ADA-USD"},
-		},
+		Store:               store,
+		D:                   make(chan coinbasepro.Message),
+		L:                   make(chan coinbasepro.Message),
+		C:                   make(chan coinbasepro.Message),
+		Assets:              assets,
 		TickerUrl:           "wss://ws-feed.pro.coinbase.com",
 		TickerSubscriptions: []string{},
 	}

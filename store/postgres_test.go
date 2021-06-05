@@ -9,9 +9,9 @@ import (
 
 func TestPostgres(t *testing.T) {
 	db := store.NewPostgres(
-		os.Getenv("postgres_host"),
-		os.Getenv("postgres_username"),
-		os.Getenv("postgres_password"),
+		os.Getenv("cbot_postgres_host"),
+		os.Getenv("cbot_postgres_username"),
+		os.Getenv("cbot_postgres_password"),
 		5432,
 		"cbot")
 	if err := db.Connect(); err != nil {

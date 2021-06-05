@@ -1,13 +1,10 @@
 #!/usr/bin/zsh
 
-loadSecrets() {
-    export COINBASE_API_KEY=$(cat local/secrets.json | jq -r .COINBASE_API_KEY)
-    export COINBASE_API_SECRET=$(cat local/secrets.json | jq -r .COINBASE_API_SECRET)
-    export COINBASE_API_PASSPHRASE=$(cat local/secrets.json | jq -r .COINBASE_API_PASSPHRASE)
-    export postgres_username=$(cat local/secrets.json | jq -r .postgres_username)
-    export postgres_password=$(cat local/secrets.json | jq -r .postgres_password)
-    export postgres_port=$(cat local/secrets.json | jq -r .postgres_port)
-    export postgres_host=$(cat local/secrets.json | jq -r .postgres_host)
+loadConfig() {
+    for k in $(jq -r '. | keys | .[]' local/config.json); do
+        v=$(jq -r ".[\"$k\"]" local/config.json);
+        export $k=$v
+    done
 }
 
 clean() {
@@ -17,7 +14,7 @@ clean() {
 }
 
 run() {
-    loadSecrets
+    loadConfig
     go run ./cmd/main.go
 }
 
@@ -26,7 +23,7 @@ generateReadme() {
 }
 
 build() {
-    loadSecrets
+    loadConfig
     clean
     mkdir dist
     go build ./cmd/main.go 

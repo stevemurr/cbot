@@ -20,26 +20,39 @@ type Bot struct {
 	Store               store.Store
 }
 
-func (b *Bot) getTickerConnection() error {
+func dialWebsocket(url string) (*ws.Conn, error) {
 	var wsDialer ws.Dialer
-	wsConn, _, err := wsDialer.Dial(b.TickerUrl, nil)
+	wsConn, _, err := wsDialer.Dial(url, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	return wsConn, nil
+}
 
-	subscribe := coinbasepro.Message{
+func buildSubscribePayload(tickerSubscriptions []string) coinbasepro.Message {
+	return coinbasepro.Message{
 		Type: "subscribe",
 		Channels: []coinbasepro.MessageChannel{
 			{
 				Name:       "ticker",
-				ProductIds: b.TickerSubscriptions,
+				ProductIds: tickerSubscriptions,
 			},
 		},
 	}
-	if err := wsConn.WriteJSON(subscribe); err != nil {
+}
+
+func (b *Bot) getTickerConnection() error {
+	wsConn, err := dialWebsocket(b.TickerUrl)
+	if err != nil {
 		return err
 	}
 	b.wsConn = wsConn
+
+	subscribe := buildSubscribePayload(b.TickerSubscriptions)
+	if err := b.wsConn.WriteJSON(subscribe); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -51,8 +64,8 @@ func (b *Bot) updateSubscriptions() {
 	b.TickerSubscriptions = subs
 }
 
-// ListenToTicker --
-func (b *Bot) Listen() error {
+// ListenToTicker opens a connection to the coinbase ticker stream and reads indefinitely
+func (b *Bot) ListenToTicker() error {
 	b.updateSubscriptions()
 
 	if err := b.getTickerConnection(); err != nil {
@@ -69,6 +82,7 @@ func (b *Bot) Listen() error {
 	}
 }
 
+// Evaluate registered actions every tick
 func (b *Bot) Evaluate() error {
 	for {
 		select {
@@ -81,7 +95,7 @@ func (b *Bot) Evaluate() error {
 	}
 }
 
-func (b *Bot) Sinkhole() error {
+func (b *Bot) LogToDatabase() error {
 	if err := b.Store.Connect(); err != nil {
 		return err
 	}

@@ -1,14 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/preichenberger/go-coinbasepro/v2"
 	"github.com/stevemurr/cbot"
-	"github.com/stevemurr/cbot/asset"
+	"github.com/stevemurr/cbot/config"
 	"github.com/stevemurr/cbot/store"
 )
 
@@ -16,7 +14,7 @@ func logger(L chan coinbasepro.Message) {
 	for {
 		select {
 		case m := <-L:
-			log.Println(m.ProductID, m.Price)
+			log.Println(m.ProductID, m.Side, m.Price)
 		default:
 			continue
 		}
@@ -24,33 +22,30 @@ func logger(L chan coinbasepro.Message) {
 }
 
 func main() {
-	port, err := strconv.Atoi(os.Getenv("cbot_postgres_port"))
+
+	store := store.NewPostgres(
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_DB"))
+
+	c, err := config.ReadConfig("./config.json")
 	if err != nil {
 		panic(err)
 	}
-	store := store.NewPostgres(
-		os.Getenv("cbot_postgres_host"),
-		os.Getenv("cbot_postgres_username"),
-		os.Getenv("cbot_postgres_password"),
-		port,
-		"cbot")
-
-	assets := map[string]asset.Asset{}
-	json.Unmarshal([]byte(string(os.Getenv("cbot_assets"))), &assets)
 
 	b := cbot.Bot{
 		Store:               store,
 		D:                   make(chan coinbasepro.Message),
 		L:                   make(chan coinbasepro.Message),
 		C:                   make(chan coinbasepro.Message),
-		Assets:              assets,
-		TickerUrl:           "wss://ws-feed.pro.coinbase.com",
+		Assets:              c.AssetMap,
+		TickerUrl:           "wss://ws-feed.exchange.coinbase.com",
 		TickerSubscriptions: []string{},
 	}
 
-	go b.Listen()
+	go b.ListenToTicker()
 	go b.Evaluate()
-	go b.Sinkhole()
+	go b.LogToDatabase()
 
 	logger(b.L)
 }

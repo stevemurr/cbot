@@ -1,18 +1,44 @@
-# CBOT
+# CBOT 
 
-Computers are good at doing stuff.  Is there some way to make a computer turn nothingness into moneyness?  No.  But computers can sure as fuck get you half way there.  
+CBOT is a coinbase trading framework and is a super work in progress.
 
-## Actions
+- listens to coinbase ticker and saves price data
+- **TODO**: try modeling trading [using ecs](https://www.youtube.com/watch?v=W3aieHjyNvw&list=PLSWK4JALZGZNVcTcoXcTjWn8DrUP7TOeR&index=2)
 
-Actions 
+**Entity** is a collection of components  
+**Component** is state with no behavior  
+**System** has behavior and stores no state  
 
-### How to write an action
+```
+Entity Admin
+    []System
+    map[entityId]Entity
+    []Component
 
+EntityAdmin
+    for system in systems
+        system.update(timestep)
 
+system.update
+    for component in components
+        component.update
+```
 
 # Run
 
-```bash
-load-devrc
-run
+pre-requisite: Install `make` and `golang` for your platform.
+
+### Build
+```
+make build
+```
+
+### Run
+```
+make run
+```
+
+### Clean
+```
+make reset
 ```

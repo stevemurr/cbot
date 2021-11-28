@@ -3,6 +3,7 @@ package store
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	_ "github.com/lib/pq"
 )
@@ -20,10 +21,10 @@ type Postgres struct {
 	db             *sql.DB
 }
 
-func NewPostgres(host string, username string, password string, port int, db string) *Postgres {
+func NewPostgres(username string, password string, db string) *Postgres {
 	connectionInfo := ConnectionInfo{
-		Host:     host,
-		Port:     port,
+		Host:     "db",
+		Port:     5432,
 		Username: username,
 		Password: password,
 		DB:       db,
@@ -39,9 +40,8 @@ func (p *Postgres) Connect() error {
 		p.connectionInfo.Username,
 		p.connectionInfo.Password,
 		p.connectionInfo.DB)
-
+	log.Println(connString)
 	db, err := sql.Open("postgres", connString)
-
 	if err != nil {
 		return err
 	}
@@ -56,6 +56,13 @@ func (p *Postgres) Close() error {
 func (p *Postgres) Query(args ...string) (interface{}, error) {
 
 	return nil, nil
+}
+
+func (p *Postgres) Exec(statement string) error {
+	if _, err := p.db.Exec(statement); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (p *Postgres) Insert(args ...string) error {

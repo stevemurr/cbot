@@ -18,6 +18,7 @@ type Queryable interface {
 type Modifiable interface {
 	Insert(...string) error
 }
+
 type Closeable interface {
 	Close() error
 }
